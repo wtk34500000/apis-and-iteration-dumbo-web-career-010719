@@ -16,13 +16,31 @@ def movieInfo(movie_name)
   puts response_hash["results"].find {|film| film["title"].downcase == movie_name.downcase}
 end
 
+def into_hash(url)
+  response_string = RestClient.get(url)
+  response_hash = JSON.parse(response_string)
+  return response_hash
+end
+
+
 def get_character_movies_from_api(character_name)
   #make the web request
-  response_string = RestClient.get('http://www.swapi.co/api/people/')
-  response_hash = JSON.parse(response_string)
+  # response_string = RestClient.get('http://www.swapi.co/api/people/')
+  # response_hash = JSON.parse(response_string)
+  temp_page="https://swapi.co/api/people/?page=1"
+  array=[]
+
   
-   urls=response_hash["results"].find {|item| item["name"].downcase == character_name}["films"]
+  while temp_page != nil
+       result=into_hash(temp_page)
+       array.concat(result["results"])
+       temp_page=result["next"]
+  end
   
+  #binding.pry
+   urls=array.find {|item| item["name"].downcase == character_name}["films"]
+  
+
   # funciton
   # urls.may 
   # puts response_hash["results"][films].find()[title]
